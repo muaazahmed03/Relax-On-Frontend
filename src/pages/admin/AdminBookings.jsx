@@ -1,12 +1,24 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Calendar, Search, Filter, Eye, CheckCircle, XCircle, Clock, DollarSign, User } from "lucide-react"
+import {
+  Calendar,
+  Search,
+  Filter,
+  Eye,
+  CheckCircle,
+  XCircle,
+  Clock,
+  DollarSign,
+  User,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 import axios from "axios"
 import toast from "react-hot-toast"
 
-// Configure axios base URL
-axios.defaults.baseURL = "http://localhost:5000/api"
+axios.defaults.baseURL = "https://relax-on-backend-production-8652.up.railway.app/api"
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([])
@@ -144,7 +156,12 @@ const AdminBookings = () => {
         },
       })
 
-      toast.success(`Booking ${action}d successfully`)
+      const actionMessage =
+        action === "complete" || action === "cancel"
+          ? `Booking ${action}d successfully - Time slot is now available for new bookings`
+          : `Booking ${action}d successfully`
+
+      toast.success(actionMessage)
 
       // Reload both bookings and stats
       await loadBookings()
@@ -171,21 +188,40 @@ const AdminBookings = () => {
     try {
       const token = localStorage.getItem("token")
 
-      // Process each booking individually
-      for (const bookingId of selectedBookings) {
-        await axios.put(
-          `/admin/bookings/${bookingId}/status`,
-          { status },
+      if (action === "delete") {
+        // Use the bulk delete endpoint
+        await axios.post(
+          "/admin/bookings/bulk-delete",
+          { bookingIds: selectedBookings },
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           },
         )
+      } else {
+        // Process each booking individually for status updates
+        for (const bookingId of selectedBookings) {
+          await axios.put(
+            `/admin/bookings/${bookingId}/status`,
+            { status },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+        }
       }
 
       setSelectedBookings([])
-      toast.success(`Bulk ${action} completed`)
+
+      const bulkMessage =
+        action === "complete" || action === "cancel" || action === "delete"
+          ? `Bulk ${action} completed - ${selectedBookings.length} time slots are now available for new bookings`
+          : `Bulk ${action} completed`
+
+      toast.success(bulkMessage)
 
       // Reload both bookings and stats
       await loadBookings()
@@ -227,7 +263,32 @@ const AdminBookings = () => {
   }
 
   const formatStatus = (status) => {
+    if (!status) {
+      return "UNKNOWN"
+    }
     return status.replace("_", " ").toUpperCase()
+  }
+
+  const handleDeleteBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to delete this booking? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const token = localStorage.getItem("token")
+      await axios.delete(`/admin/bookings/${bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      toast.success("Booking deleted successfully - Time slot is now available for new bookings")
+      loadBookings() // Refresh the list
+      loadStats() // Refresh stats
+    } catch (error) {
+      console.error("Error deleting booking:", error)
+      toast.error("Failed to delete booking")
+    }
   }
 
   if (loading && currentPage === 1) {
@@ -339,10 +400,6 @@ const AdminBookings = () => {
                 <option value="">All Status</option>
                 <option value="pending">Pending</option>
                 <option value="confirmed">Confirmed</option>
-                <option value="therapist_assigned">Therapist Assigned</option>
-                <option value="en_route">En Route</option>
-                <option value="arrived">Arrived</option>
-                <option value="in_progress">In Progress</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
               </select>
@@ -355,39 +412,46 @@ const AdminBookings = () => {
               />
             </div>
           </div>
+        </div>
 
-          {/* Bulk Actions */}
-          {selectedBookings.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-blue-900">{selectedBookings.length} bookings selected</span>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleBulkAction("confirm", "confirmed")}
-                    disabled={actionLoading}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded transition-colors disabled:opacity-50"
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    onClick={() => handleBulkAction("complete", "completed")}
-                    disabled={actionLoading}
-                    className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded transition-colors disabled:opacity-50"
-                  >
-                    Complete
-                  </button>
-                  <button
-                    onClick={() => handleBulkAction("cancel", "cancelled")}
-                    disabled={actionLoading}
-                    className="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-1 px-3 rounded transition-colors disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                </div>
+        {/* Bulk Actions */}
+        {selectedBookings.length > 0 && (
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-blue-900">{selectedBookings.length} bookings selected</span>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleBulkAction("confirm", "confirmed")}
+                  disabled={actionLoading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded transition-colors disabled:opacity-50"
+                >
+                  Confirm
+                </button>
+                <button
+                  onClick={() => handleBulkAction("complete", "completed")}
+                  disabled={actionLoading}
+                  className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded transition-colors disabled:opacity-50"
+                >
+                  Complete
+                </button>
+                <button
+                  onClick={() => handleBulkAction("cancel", "cancelled")}
+                  disabled={actionLoading}
+                  className="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-1 px-3 rounded transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleBulkAction("delete")}
+                  disabled={actionLoading}
+                  className="bg-gray-800 hover:bg-gray-900 text-white text-sm font-medium py-1 px-3 rounded transition-colors disabled:opacity-50"
+                >
+                  Delete
+                </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Bookings Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -414,6 +478,9 @@ const AdminBookings = () => {
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date & Time
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Address & Therapist
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
@@ -464,6 +531,15 @@ const AdminBookings = () => {
                       <div>
                         <div className="text-sm font-medium text-gray-900">{booking.date}</div>
                         <div className="text-xs text-gray-500">{booking.time}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {booking.address?.street}, {booking.address?.city}
+                      </div>
+                      <div className="text-sm text-gray-500">{booking.address?.postalCode}</div>
+                      <div className="text-sm text-purple-600 font-medium">
+                        Therapist: {booking.therapistGender || "Not specified"}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -526,6 +602,15 @@ const AdminBookings = () => {
                             <XCircle size={16} />
                           </button>
                         )}
+
+                        {/* Delete Button */}
+                        <button
+                          onClick={() => handleDeleteBooking(booking._id)}
+                          className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors"
+                          title="Delete Booking"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -546,34 +631,90 @@ const AdminBookings = () => {
                   <button
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
+                    <ChevronLeft size={16} className="mr-1" />
                     Previous
                   </button>
 
-                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    const page = i + 1
-                    return (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-2 border rounded-lg text-sm font-medium ${
-                          currentPage === page
-                            ? "bg-blue-600 text-white border-blue-600"
-                            : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  })}
+                  {(() => {
+                    const pages = []
+                    const maxVisiblePages = 5
+                    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+                    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+                    // Adjust start page if we're near the end
+                    if (endPage - startPage + 1 < maxVisiblePages) {
+                      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+                    }
+
+                    // Add first page and ellipsis if needed
+                    if (startPage > 1) {
+                      pages.push(
+                        <button
+                          key={1}
+                          onClick={() => setCurrentPage(1)}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                          1
+                        </button>,
+                      )
+                      if (startPage > 2) {
+                        pages.push(
+                          <span key="start-ellipsis" className="px-3 py-2 text-gray-500">
+                            ...
+                          </span>,
+                        )
+                      }
+                    }
+
+                    // Add visible page numbers
+                    for (let i = startPage; i <= endPage; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i)}
+                          className={`px-3 py-2 border rounded-lg text-sm font-medium ${
+                            currentPage === i
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          {i}
+                        </button>,
+                      )
+                    }
+
+                    // Add last page and ellipsis if needed
+                    if (endPage < totalPages) {
+                      if (endPage < totalPages - 1) {
+                        pages.push(
+                          <span key="end-ellipsis" className="px-3 py-2 text-gray-500">
+                            ...
+                          </span>,
+                        )
+                      }
+                      pages.push(
+                        <button
+                          key={totalPages}
+                          onClick={() => setCurrentPage(totalPages)}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                          {totalPages}
+                        </button>,
+                      )
+                    }
+
+                    return pages
+                  })()}
 
                   <button
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
+                    <ChevronRight size={16} className="ml-1" />
                   </button>
                 </div>
               </div>
@@ -677,11 +818,14 @@ const AdminBookings = () => {
 
               {/* Address Info */}
               <div className="border-t border-gray-200 pt-6">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Service Address</h4>
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Service Address & Therapist</h4>
                 <div className="space-y-2">
                   <p className="text-sm text-gray-900">{selectedBooking.address?.street}</p>
                   <p className="text-sm text-gray-900">
                     {selectedBooking.address?.city}, {selectedBooking.address?.postalCode}
+                  </p>
+                  <p className="text-sm text-purple-600 font-medium">
+                    Therapist: {selectedBooking.therapistGender || "Not specified"}
                   </p>
                   {selectedBooking.address?.instructions && (
                     <div>

@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Users, Calendar, DollarSign, TrendingUp, Clock } from "lucide-react"
+import { Users, Calendar, DollarSign, TrendingUp, Clock, Trash2 } from "lucide-react"
 import axios from "axios"
+import toast from "react-hot-toast"
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -95,6 +96,7 @@ const AdminDashboard = () => {
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .slice(0, 5)
           .map((booking) => ({
+            _id: booking._id,
             customerName: booking.userId?.name || "Unknown",
             serviceName: booking.serviceId?.title || "Unknown Service",
             date: booking.date || new Date(booking.createdAt).toLocaleDateString(),
@@ -124,6 +126,27 @@ const AdminDashboard = () => {
         recentBookings: [],
         monthlyRevenue: [],
       })
+    }
+  }
+
+  const handleDeleteBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to delete this booking? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const token = localStorage.getItem("token")
+      await axios.delete(`/admin/bookings/${bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      toast.success("Booking deleted successfully")
+      fetchDashboardStats() // Refresh the dashboard
+    } catch (error) {
+      console.error("Error deleting booking:", error)
+      toast.error("Failed to delete booking")
     }
   }
 
@@ -226,11 +249,15 @@ const AdminDashboard = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Amount
                       </th>
+                      {/* Added Actions column */}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {stats.recentBookings.map((booking, index) => (
-                      <tr key={index}>
+                      <tr key={booking._id || index}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {booking.customerName}
                         </td>
@@ -250,6 +277,16 @@ const AdminDashboard = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">£{booking.amount}</td>
+                        {/* Added delete button */}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <button
+                            onClick={() => handleDeleteBooking(booking._id)}
+                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors"
+                            title="Delete Booking"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

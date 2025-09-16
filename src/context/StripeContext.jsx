@@ -6,7 +6,7 @@ import { Elements } from "@stripe/react-stripe-js"
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe(
-  "pk_test_51Rl8JiDiF7DP9Ei0Hi6fCD2570Dh5V1zv42WONYgFqv8GsEJcGOewCmgVzi4lwqrAPxabijoPbSfSceiV0zY0TF000hsfVIFFI",
+  "pk_live_51S5CQiLVyJc2DfAdEivaxxo46MUv8Bz7bw02YIbgppcIyiB1GtQ2zFnGgHP2OJxVjiMIQhHgQ57FDyJNqmCOKHC800R6gHQYl8",
 )
 
 const StripeContext = createContext()

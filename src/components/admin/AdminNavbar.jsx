@@ -33,11 +33,16 @@ const AdminNavbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Urban Logo */}
           <Link to="/admin/dashboard" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">U</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+              <img
+                src="/logo.png"  // yahan apna logo ka actual file name daalna hai
+                alt="Relax On Admin Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <span className="text-xl font-bold text-white">Urban Admin</span>
+            <span className="text-xl font-bold text-white">Relax On Admin</span>
           </Link>
+
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -48,9 +53,8 @@ const AdminNavbar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
-                    isActive ? "bg-blue-600 text-white" : "text-gray-300 hover:text-white hover:bg-gray-800"
-                  }`}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${isActive ? "bg-blue-600 text-white" : "text-gray-300 hover:text-white hover:bg-gray-800"
+                    }`}
                 >
                   <Icon size={18} />
                   <span className="font-medium">{item.label}</span>
@@ -108,9 +112,8 @@ const AdminNavbar = () => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
-                      isActive ? "bg-blue-600 text-white" : "text-gray-300 hover:text-white hover:bg-gray-800"
-                    }`}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${isActive ? "bg-blue-600 text-white" : "text-gray-300 hover:text-white hover:bg-gray-800"
+                      }`}
                     onClick={() => setIsOpen(false)}
                   >
                     <Icon size={18} />

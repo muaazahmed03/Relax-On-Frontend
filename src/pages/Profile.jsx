@@ -80,17 +80,38 @@ const Profile = () => {
 
   const loadBookingStats = async () => {
     try {
-      const response = await axios.get("/bookings/my-bookings")
-      const bookings = response.data.bookings || []
-
-      setBookingStats({
-        total: bookings.length,
-        completed: bookings.filter((b) => b.status === "completed").length,
-        upcoming: bookings.filter((b) => !["completed", "cancelled"].includes(b.status)).length,
-        cancelled: bookings.filter((b) => b.status === "cancelled").length,
+      const response = await axios.get("/bookings/user", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
+      console.log("✅ Booking stats response:", response.data)
+
+      if (response.data.success) {
+        const bookings = response.data.bookings || []
+
+        setBookingStats({
+          total: bookings.length,
+          completed: bookings.filter((b) => b.status === "completed").length,
+          upcoming: bookings.filter((b) => !["completed", "cancelled"].includes(b.status)).length,
+          cancelled: bookings.filter((b) => b.status === "cancelled").length,
+        })
+      } else {
+        setBookingStats({
+          total: 0,
+          completed: 0,
+          upcoming: 0,
+          cancelled: 0,
+        })
+      }
     } catch (error) {
-      console.error("Failed to load booking stats")
+      console.error("Failed to load booking stats:", error)
+      setBookingStats({
+        total: 0,
+        completed: 0,
+        upcoming: 0,
+        cancelled: 0,
+      })
     }
   }
 
@@ -216,7 +237,7 @@ const Profile = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
           <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 bg-gradient-to-br from-cyan-100 to-cyan-50 rounded-full flex items-center justify-center overflow-hidden">
                 {imagePreview ? (
                   <img
                     src={imagePreview || "/placeholder.svg"}
@@ -230,10 +251,10 @@ const Profile = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="text-blue-600" size={32} />
+                  <User className="text-cyan-500" size={32} />
                 )}
               </div>
-              <label className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors cursor-pointer">
+              <label className="absolute -bottom-1 -right-1 w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center text-white hover:bg-cyan-600 transition-colors cursor-pointer">
                 <Camera size={16} />
                 <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
               </label>
@@ -251,7 +272,7 @@ const Profile = () => {
               <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
               <p className="text-gray-600">{user.email}</p>
               <div className="flex items-center justify-center sm:justify-start mt-2">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-cyan-100 text-blue-700 border border-blue-200">
                   Customer
                 </span>
               </div>
@@ -288,7 +309,7 @@ const Profile = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
                       activeTab === tab.id
-                        ? "bg-blue-50 text-blue-600 border border-blue-200"
+                        ? "bg-cyan-50 text-cyan-500 border border-cyan-300"
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
@@ -310,7 +331,7 @@ const Profile = () => {
                     <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
                     <button
                       onClick={() => setEditMode(!editMode)}
-                      className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      className="flex items-center space-x-2 text-cyan-500 hover:text-cyan-600 transition-colors"
                     >
                       {editMode ? <X size={16} /> : <Edit3 size={16} />}
                       <span>{editMode ? "Cancel" : "Edit"}</span>
@@ -374,7 +395,7 @@ const Profile = () => {
                     <h2 className="text-xl font-semibold text-gray-900">My Addresses</h2>
                     <button
                       onClick={() => setShowAddressForm(true)}
-                      className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="flex items-center space-x-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       <Plus size={16} />
                       <span>Add Address</span>
@@ -516,7 +537,7 @@ const Profile = () => {
                         <button
                           onClick={handlePasswordChange}
                           disabled={loading}
-                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
+                          className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
                         >
                           {loading ? "Changing..." : "Change Password"}
                         </button>

@@ -51,31 +51,35 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Create account</h2>
-            <p className="text-gray-600 mt-2">Join Urban Massage today</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
+      <div className="max-w-md w-full space-y-8 animate-slide-up">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">Create your account</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Or{" "}
+            <Link to="/login" className="font-medium text-cyan-600 hover:text-cyan-500">
+              sign in to your existing account
+            </Link>
+          </p>
+        </div>
+        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Full name
+                Full Name
               </label>
               <input
                 id="name"
                 name="name"
                 type="text"
+                autoComplete="name"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                placeholder="Enter your full name"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all"
+                placeholder="John Doe"
                 value={formData.name}
                 onChange={handleChange}
               />
             </div>
-
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email address
@@ -84,46 +88,29 @@ const Register = () => {
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                placeholder="Enter your email"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all"
+                placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
-
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                Phone number
+                Phone Number
               </label>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                placeholder="Enter your phone number"
+                autoComplete="tel"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all"
+                placeholder="+44 7700 900777"
                 value={formData.phone}
                 onChange={handleChange}
               />
             </div>
-
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-                I want to
-              </label>
-              <select
-                id="role"
-                name="role"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="customer">Book massages</option>
-                <option value="therapist">Provide massage services</option>
-              </select>
-            </div>
-
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -133,9 +120,10 @@ const Register = () => {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   required
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Create a password"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Enter a strong password"
                   value={formData.password}
                   onChange={handleChange}
                 />
@@ -158,7 +146,7 @@ const Register = () => {
                 name="confirmPassword"
                 type="password"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all"
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -168,7 +156,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Creating account..." : "Create account"}
             </button>
@@ -177,13 +165,35 @@ const Register = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+              <Link to="/login" className="text-cyan-600 hover:text-cyan-700 font-medium">
                 Sign in
               </Link>
             </p>
           </div>
         </div>
       </div>
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out;
+        }
+      `}</style>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js"
 import { ArrowLeft, Calendar, Clock, MapPin, User, CreditCard, Lock } from "lucide-react"
 import axios from "axios"
@@ -10,6 +10,7 @@ import toast from "react-hot-toast"
 const PaymentPage = () => {
   const { bookingId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -20,8 +21,18 @@ const PaymentPage = () => {
 
   useEffect(() => {
     console.log("🔍 Payment page loaded for booking:", bookingId)
-    fetchBookingDetails()
-  }, [bookingId])
+    console.log("📋 Location state:", location.state)
+
+    if (location.state?.booking) {
+      console.log("✅ Using booking data from state")
+      setBooking(location.state.booking)
+      createPaymentIntent(location.state.booking.totalAmount)
+      setLoading(false)
+    } else {
+      console.log("📡 Fetching booking details from API")
+      fetchBookingDetails()
+    }
+  }, [bookingId, location.state])
 
   const fetchBookingDetails = async () => {
     try {
@@ -100,10 +111,21 @@ const PaymentPage = () => {
       } else if (paymentIntent.status === "succeeded") {
         console.log("🎉 Payment succeeded:", paymentIntent.id)
 
-        // Update booking status
-        await updateBookingStatus(paymentIntent.id)
+         // API call to update booking status on backend
+        // Yahan par payment status ko 'paid' mein update kiya ja raha hai
+        await axios.put(`/bookings/${bookingId}/payment`, {
+          status: 'confirmed', // 'confirmed' ya 'paid' jo bhi aap use kar rahe hain
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        
+        // Is line se user ko dashboard par refresh ke liye signal milega
+        navigate("/dashboard", { state: { refreshBookings: true } })
+        
         toast.success("Payment successful!")
-        navigate("/booking-success", { state: { booking } })
+
       }
     } catch (error) {
       console.error("❌ Payment processing error:", error)
@@ -165,7 +187,7 @@ const PaymentPage = () => {
             <span>Back to Dashboard</span>
           </button>
           <h1 className="text-3xl font-bold text-gray-900">Complete Your Payment</h1>
-          <p className="text-gray-600 mt-2">Booking ID: {booking.bookingId}</p>
+          <p className="text-gray-600 mt-2">Booking ID: {booking.bookingId || booking._id}</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -179,8 +201,10 @@ const PaymentPage = () => {
                   <Calendar className="text-blue-600" size={16} />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{booking.serviceId?.title}</p>
-                  <p className="text-gray-600 text-sm">{booking.serviceId?.description}</p>
+                  <p className="font-medium text-gray-900">{booking.service?.title || booking.serviceId?.title}</p>
+                  <p className="text-gray-600 text-sm">
+                    {booking.service?.description || booking.serviceId?.description}
+                  </p>
                 </div>
               </div>
 
@@ -202,7 +226,14 @@ const PaymentPage = () => {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Service Location</p>
-                  <p className="text-gray-600 text-sm">{booking.address}</p>
+                  <p className="text-gray-600 text-sm">
+                    {booking.address?.street && booking.address?.city && booking.address?.postalCode
+                      ? `${booking.address.street}, ${booking.address.city}, ${booking.address.postalCode}`
+                      : booking.address || "Address not provided"}
+                  </p>
+                  {booking.preferredBranch && (
+                    <p className="text-gray-500 text-xs mt-1">Branch: {booking.preferredBranch}</p>
+                  )}
                 </div>
               </div>
 
@@ -213,7 +244,9 @@ const PaymentPage = () => {
                 <div>
                   <p className="font-medium text-gray-900">Therapist</p>
                   <p className="text-gray-600 text-sm">
-                    {booking.therapistId?.name || "Auto-assigned (Best available)"}
+                    {booking.therapistGender
+                      ? `${booking.therapistGender.charAt(0).toUpperCase() + booking.therapistGender.slice(1)} Therapist`
+                      : "Auto-assigned (Best available)"}
                   </p>
                 </div>
               </div>
@@ -223,16 +256,16 @@ const PaymentPage = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Service Fee:</span>
-                  <span className="font-medium">£{booking.servicePrice}</span>
+                  <span className="font-medium">£{booking.servicePrice || booking.service?.price}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Platform Fee:</span>
-                  <span className="font-medium">£{booking.platformFee}</span>
+                  <span className="font-medium">£{booking.platformFee || 0}</span>
                 </div>
                 <div className="border-t border-gray-200 pt-2 mt-2">
                   <div className="flex justify-between">
                     <span className="font-semibold text-gray-900">Total Amount:</span>
-                    <span className="font-bold text-blue-600 text-xl">£{booking.totalAmount}</span>
+                    <span className="font-bold text-cyan-500 text-xl">£{booking.totalAmount}</span>
                   </div>
                 </div>
               </div>
@@ -242,7 +275,7 @@ const PaymentPage = () => {
           {/* Payment Form */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center space-x-2 mb-6">
-              <CreditCard className="text-blue-600" size={24} />
+              <CreditCard className="text-cyan-600" size={24} />
               <h2 className="text-xl font-semibold text-gray-900">Payment Details</h2>
             </div>
 
@@ -279,7 +312,7 @@ const PaymentPage = () => {
               <button
                 type="submit"
                 disabled={!stripe || processing || !clientSecret}
-                className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+                className="w-full bg-cyan-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
               >
                 {processing ? (
                   <>

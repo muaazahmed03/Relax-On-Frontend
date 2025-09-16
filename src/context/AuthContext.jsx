@@ -5,8 +5,7 @@ import axios from "axios"
 
 const AuthContext = createContext()
 
-// Image base URL export
-export const IMAGE_BASE_URL = "https://urban-backend-production.up.railway.app"
+export const IMAGE_BASE_URL = "https://relax-on-backend-production-8652.up.railway.app"
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
@@ -20,8 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Set axios defaults - PORT 5000 confirmed
-  axios.defaults.baseURL = "https://urban-backend-production.up.railway.app/api"
+  axios.defaults.baseURL = "https://relax-on-backend-production-8652.up.railway.app/api"
 
   useEffect(() => {
     const token = localStorage.getItem("token")

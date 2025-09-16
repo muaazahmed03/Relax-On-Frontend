@@ -23,19 +23,23 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm sm:text-lg">U</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden border-2 border-black">
+              <img
+                src="/logo.png"
+                alt="Relax On Admin Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <span className="text-lg sm:text-xl font-bold text-gray-900 hidden xs:block">Urban Massage</span>
-            <span className="text-lg sm:text-xl font-bold text-gray-900 xs:hidden">Urban</span>
+            <span className="text-lg sm:text-xl font-bold text-cyan-600 hidden xs:block">Relax On</span>
+            <span className="text-lg sm:text-xl font-bold text-cyan-600 xs:hidden">Relax On</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            <Link to="/services" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <Link to="/services" className="text-gray-600 hover:text-cyan-600 transition-colors font-medium">
               Services
             </Link>
-            <Link to="/how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <Link to="/how-it-works" className="text-gray-600 hover:text-cyan-600 transition-colors font-medium">
               How it works
             </Link>
 
@@ -43,7 +47,7 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                  className="flex items-center space-x-2 text-gray-600 hover:text-cyan-600 transition-colors font-medium"
                 >
                   <User size={18} />
                   <span className="hidden lg:block">{user.name}</span>
@@ -53,7 +57,7 @@ const Navbar = () => {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
                     <Link
                       to="/dashboard"
-                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-cyan-200 transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <Calendar size={16} />
@@ -61,7 +65,7 @@ const Navbar = () => {
                     </Link>
                     <Link
                       to="/profile"
-                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-cyan-200 transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <User size={16} />
@@ -69,7 +73,7 @@ const Navbar = () => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50 w-full text-left transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-cyan-200 w-full text-left transition-colors"
                     >
                       <LogOut size={16} />
                       <span>Logout</span>
@@ -79,12 +83,12 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <Link to="/login" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+                <Link to="/login" className="text-gray-600 hover:text-cyan-600 transition-colors font-medium">
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 sm:px-4 rounded-lg transition-colors text-sm sm:text-base"
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2 px-3 sm:px-4 rounded-lg transition-colors text-sm sm:text-base"
                 >
                   Sign Up
                 </Link>
