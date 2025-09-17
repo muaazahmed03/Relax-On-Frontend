@@ -307,7 +307,7 @@ const Dashboard = () => {
                             <span className="text-sm font-medium text-gray-900">{booking.bookingId}</span>
                           </div>
                           <div className="text-right">
-                            <span className="text-lg font-bold text-cyan-600">£{booking.totalAmount}</span>
+                            <span className="text-lg font-bold text-cyan-600">£{booking.servicePrice || booking.service?.price}</span>
                             <div className="text-xs text-gray-500">
                               {booking.paymentStatus === "paid" ? "Paid" : "Payment Pending"}
                             </div>

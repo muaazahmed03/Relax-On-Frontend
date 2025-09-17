@@ -272,7 +272,7 @@ const Services = () => {
                     <p className="text-gray-600 mb-4 text-sm leading-relaxed">{service.description}</p>
 
                     <div className="space-y-3 mb-6">
-                      {service.duration?.slice(0, 2).map((duration, idx) => (
+                      {service.duration?.slice(0, 3).map((duration, idx) => (
                         <div
                           key={duration}
                           className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors duration-300"

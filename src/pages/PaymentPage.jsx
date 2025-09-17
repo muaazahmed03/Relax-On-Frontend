@@ -44,7 +44,7 @@ const PaymentPage = () => {
       if (response.data.success) {
         setBooking(response.data.booking)
         // Create payment intent
-        await createPaymentIntent(response.data.booking.totalAmount)
+        await createPaymentIntent(response.data.booking.servicePrice || response.data.booking.service?.price)
       } else {
         toast.error("Booking not found")
         navigate("/dashboard")
@@ -258,14 +258,10 @@ const PaymentPage = () => {
                   <span className="text-gray-600">Service Fee:</span>
                   <span className="font-medium">£{booking.servicePrice || booking.service?.price}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Platform Fee:</span>
-                  <span className="font-medium">£{booking.platformFee || 0}</span>
-                </div>
                 <div className="border-t border-gray-200 pt-2 mt-2">
                   <div className="flex justify-between">
                     <span className="font-semibold text-gray-900">Total Amount:</span>
-                    <span className="font-bold text-cyan-500 text-xl">£{booking.totalAmount}</span>
+                    <span className="font-bold text-cyan-500 text-xl">£{booking.servicePrice || booking.service?.price}</span>
                   </div>
                 </div>
               </div>
@@ -322,7 +318,7 @@ const PaymentPage = () => {
                 ) : (
                   <>
                     <CreditCard size={20} />
-                    <span>Pay £{booking.totalAmount}</span>
+                    <span>Pay £{booking.servicePrice || booking.service?.price}</span>
                   </>
                 )}
               </button>

@@ -550,7 +550,7 @@ const AdminBookings = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">${booking.totalAmount}</div>
+                      <div className="text-sm font-medium text-gray-900">${booking.servicePrice || booking.service?.price}</div>
                       <div className="text-xs text-gray-500">{booking.paymentStatus}</div>
                     </td>
                     <td className="px-6 py-4">
@@ -788,7 +788,7 @@ const AdminBookings = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount</label>
-                    <p className="text-lg font-semibold text-green-600">${selectedBooking.totalAmount}</p>
+                    <p className="text-lg font-semibold text-green-600">${selectedBooking.servicePrice || booking.service?.price}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>

@@ -12,6 +12,45 @@ const Home = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
+  const fallbackServices = [
+    {
+      title: "Deep Tissue Massage",
+      description: "Therapeutic massage targeting deep muscle layers to relieve chronic tension and pain.",
+      duration: ["30 minutes", "60 minutes", "90 minutes"],
+      price: { "30min": 25, "60min": 50, "90min": 75 },
+    },
+    {
+      title: "Swedish Massage",
+      description: "Classic relaxation massage using long, flowing strokes to promote relaxation.",
+      duration: ["30 minutes", "60 minutes", "90 minutes"],
+      price: { "30min": 25, "60min": 50, "90min": 75 },
+    },
+    {
+      title: "Sports Massage",
+      description: "Specialized massage for athletes and active individuals to enhance performance.",
+      duration: ["30 minutes", "60 minutes", "90 minutes"],
+      price: { "30min": 25, "60min": 50, "90min": 75 },
+    },
+    {
+      title: "Aromatherapy Massage",
+      description: "Relaxing massage with essential oils to enhance mood and reduce stress.",
+      duration: ["30 minutes", "60 minutes", "90 minutes"],
+      price: { "30min": 25, "60min": 50, "90min": 75 },
+    },
+    {
+      title: "Hot Stone Massage",
+      description: "Therapeutic massage using heated stones to relax muscles and improve circulation.",
+      duration: ["30 minutes", "60 minutes", "90 minutes"],
+      price: { "30min": 25, "60min": 50, "90min": 75 },
+    },
+    {
+      title: "Pregnancy Massage",
+      description: "Gentle massage designed specifically for expectant mothers to reduce discomfort.",
+      duration: ["30 minutes", "60 minutes", "90 minutes"],
+      price: { "30min": 25, "60min": 50, "90min": 75 },
+    },
+  ]
+
   useEffect(() => {
     fetchServices()
   }, [])
@@ -22,6 +61,7 @@ const Home = () => {
       setServices(response.data.slice(0, 3))
     } catch (error) {
       console.error("Error fetching services:", error)
+      setServices(fallbackServices.slice(0, 3))
     }
   }
 
@@ -124,10 +164,22 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
-              { number: "500+", label: "Happy Customers" },
-              { number: "50+", label: "Expert Therapists" },
-              { number: "4.9", label: "Average Rating" },
-              { number: "24/7", label: "Available" },
+              {
+                number: "500+",
+                label: "Happy Customers",
+              },
+              {
+                number: "50+",
+                label: "Expert Therapists",
+              },
+              {
+                number: "4.9",
+                label: "Average Rating",
+              },
+              {
+                number: "24/7",
+                label: "Available",
+              },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -226,9 +278,9 @@ const Home = () => {
                     <p className="text-gray-600 mb-4 text-sm sm:text-base line-clamp-2">{service.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xl sm:text-2xl font-bold text-cyan-600">
-                        ${service.price?.["60min"] || "N/A"}
+                        €{service.price?.["30min"] || "25"}
                       </span>
-                      <span className="text-xs sm:text-sm text-gray-500">60 minutes</span>
+                      <span className="text-xs sm:text-sm text-gray-500">30 minutes</span>
                     </div>
                   </div>
                 </div>

@@ -50,9 +50,9 @@ const BookingFlow = () => {
         category: "massage",
         duration: ["30 minutes", "60 minutes", "90 minutes"],
         price: {
-          "30min": 50,
-          "60min": 80,
-          "90min": 120,
+          "30min": 25,
+          "60min": 50,
+          "90min": 75,
         },
       }
 
@@ -720,23 +720,14 @@ const BookingFlow = () => {
                         £{bookingData.service.price?.[bookingData.duration.replace(" minutes", "min")] || 0}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Platform Fee:</span>
-                      <span className="font-medium">
-                        £
-                        {Math.round(
-                          (bookingData.service.price?.[bookingData.duration.replace(" minutes", "min")] || 0) * 0.1,
-                        )}
-                      </span>
-                    </div>
                     <div className="border-t border-gray-200 pt-2 mt-2">
                       <div className="flex justify-between">
-                        <span className="font-semibold text-gray-900">Total:</span>
+                        <span className="font-semibold text-gray-900">Total Price:</span>
                         <span className="font-bold text-cyan-600 text-xl">
                           £
                           {(bookingData.service.price?.[bookingData.duration.replace(" minutes", "min")] || 0) +
                             Math.round(
-                              (bookingData.service.price?.[bookingData.duration.replace(" minutes", "min")] || 0) * 0.1,
+                              (bookingData.service.price?.[bookingData.duration.replace(" minutes", "min")] || 0) * 0,
                             )}
                         </span>
                       </div>
